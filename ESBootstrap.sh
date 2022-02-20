@@ -28,15 +28,18 @@ wget -nc -q https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$
 wget -nc -q https://artifacts.elastic.co/downloads/kibana/kibana-$VER-x86_64.rpm -P /vagrant
 wget -nc -q https://artifacts.elastic.co/downloads/kibana/kibana-$VER-x86_64.rpm.sha512 -P /vagrant
 
+wget -nc -q https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-$VER-linux-x86_64.tar.gz -P /vagrant
+wget -nc -q https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-$VER-linux-x86_64.tar.gz.sha512 -P /vagrant
+
 rpm --install /vagrant/elasticsearch-$VER-x86_64.rpm
 rpm --install /vagrant/kibana-$VER-x86_64.rpm
 
 # Make the cert dir to prevent pop-up later
 mkdir /tmp/certs/
 
-# Config the instances file for cert gen the ip is 10.0.2.15
+# Config the instances file for cert gen the ip is 10.0.0.10
 # IP addr is used again leter in kibana.yml
-IP_ADDR=10.0.2.15
+IP_ADDR=10.0.0.10
 cat > /tmp/certs/instance.yml << EOF
 instances:
   - name: 'elasticsearch'
@@ -44,6 +47,9 @@ instances:
     ip: [ '$IP_ADDR' ]
   - name: 'kibana'
     dns: [ 'kibana.localdomain' ]
+    ip: [ '$IP_ADDR' ]
+  - name: 'fleet'
+    dns: [ 'fleet.localdomain' ]
     ip: [ '$IP_ADDR' ]
 EOF
 
@@ -54,9 +60,11 @@ unzip /tmp/certs/elastic-stack-ca.zip -d /tmp/certs/
 unzip /tmp/certs/certs.zip -d /tmp/certs/
 
 mkdir /etc/kibana/certs
+mkdir /etc/pki/fleet
 
 cp /tmp/certs/ca/ca.crt /tmp/certs/elasticsearch/* /etc/elasticsearch/certs
 cp /tmp/certs/ca/ca.crt /tmp/certs/kibana/* /etc/kibana/certs
+cp /tmp/certs/ca/ca.crt /tmp/certs/fleet/* /etc/pki/fleet
 cp -r /tmp/certs/* /root/
 
 # This cp should be an unaliased cp to replace the ca.crt if it exists in the shared /vagrant dir
