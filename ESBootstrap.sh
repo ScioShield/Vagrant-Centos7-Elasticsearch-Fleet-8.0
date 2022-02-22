@@ -132,7 +132,7 @@ EOF
 systemctl start kibana
 systemctl enable kibana
 
-echo "Script done. To connect go to https://127.0.0.1:5601 on your host system"
+echo "Script done. To connect go to https://10.0.0.10:5601 on your host system"
 echo "It will take 1-5 min for Kibana to come up"
 echo "The elastic password will be displayed in the terminal you ran Vagrant from"
 echo "Under the line --Security autoconfiguration information--"
